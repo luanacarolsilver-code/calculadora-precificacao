@@ -3,685 +3,1249 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Precificação | Escritórios de Sucesso</title>
-    <meta name="description" content="Calculadora de precificação e orçamento de projetos para arquitetos, designers e profissionais criativos. Baseado no método Jornada dos Escritórios de Sucesso.">
+    <title>Plataforma de Precificação | Escritórios de Sucesso</title>
+    <meta name="description" content="Plataforma de precificação, gestão de custos e orçamento de projetos para arquitetos e designers.">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="dark-theme">
     <div class="glow-bg"></div>
     
-    <header class="app-header">
-        <div class="logo-container">
-            <div class="logo-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+    <div class="app-shell">
+        <!-- 1. SIDEBAR GLOBAL (MENU LATERAL FIXO) -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-title">Jornada dos Escritórios</span>
+                    <span class="logo-subtitle">DE SUCE$$O</span>
+                </div>
             </div>
-            <div class="logo-text">
-                <span class="logo-title">Jornada dos Escritórios</span>
-                <span class="logo-subtitle">DE SUCE$$O</span>
+            
+            <div class="sidebar-profile-brief">
+                <div class="avatar-circle">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <div class="profile-info">
+                    <span class="profile-name" id="sidebar-profile-name">Olá, Arquiteto</span>
+                    <span class="profile-status" id="sidebar-profile-office">Escritório</span>
+                </div>
             </div>
-        </div>
-        
-        <div class="header-actions">
-            <button id="theme-toggle" class="btn-icon" aria-label="Alternar tema escuro/claro">
-                <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="5"></circle>
-                    <line x1="12" y1="1" x2="12" y2="3"></line>
-                    <line x1="12" y1="21" x2="12" y2="23"></line>
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                    <line x1="1" y1="12" x2="3" y2="12"></line>
-                    <line x1="21" y1="12" x2="23" y2="12"></line>
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                </svg>
-                <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-            </button>
-            <button id="btn-reset" class="btn btn-secondary btn-sm" type="button">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-                Limpar Dados
-            </button>
-        </div>
-    </header>
 
-    <main class="app-container">
-        <!-- Sidebar de Navegação dos Passos -->
-        <aside class="sidebar-nav">
-            <div class="nav-title">Checklist de Precificação</div>
-            <nav class="steps-menu">
-                <button class="step-link active" data-tab="custos-fixos" id="step-btn-1" type="button">
-                    <span class="step-num">01</span>
-                    <span class="step-label">Custos Fixos</span>
-                </button>
-                <button class="step-link" data-tab="produtividade" id="step-btn-2" type="button">
-                    <span class="step-num">02</span>
-                    <span class="step-label">Produtividade</span>
-                </button>
-                <button class="step-link" data-tab="custo-hora" id="step-btn-3" type="button">
-                    <span class="step-num">03</span>
-                    <span class="step-label">Custo da Hora</span>
-                </button>
-                <button class="step-link" data-tab="horas-projeto" id="step-btn-4" type="button">
-                    <span class="step-num">04</span>
-                    <span class="step-label">Horas do Projeto</span>
-                </button>
-                <button class="step-link" data-tab="custos-variaveis" id="step-btn-5" type="button">
-                    <span class="step-num">05</span>
-                    <span class="step-label">Custos Variáveis</span>
-                </button>
-                <button class="step-link" data-tab="lucro-imposto" id="step-btn-6" type="button">
-                    <span class="step-num">06</span>
-                    <span class="step-label">Lucro e Imposto</span>
-                </button>
-                <button class="step-link" data-tab="resultado" id="step-btn-7" type="button">
-                    <span class="step-num">07</span>
-                    <span class="step-label">Proposta Final</span>
-                </button>
+            <nav class="sidebar-menu-global">
+                <a href="#dashboard" class="sidebar-link active" id="menu-dashboard">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    <span>Início / Dashboard</span>
+                </a>
+                <a href="#financeiro" class="sidebar-link" id="menu-financeiro">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    <span>Financeiro</span>
+                </a>
+                <a href="#clientes" class="sidebar-link" id="menu-clientes">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span>Clientes</span>
+                </a>
+                <a href="#servicos" class="sidebar-link" id="menu-servicos">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    <span>Serviços</span>
+                </a>
+                <a href="#historico" class="sidebar-link" id="menu-historico">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    <span>Histórico / Leads</span>
+                </a>
+                <a href="#perfil" class="sidebar-link" id="menu-perfil">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+                    <span>Perfil</span>
+                </a>
+                <a href="#configuracoes" class="sidebar-link" id="menu-configuracoes">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span>Configurações</span>
+                </a>
+                <a href="#ajuda" class="sidebar-link" id="menu-ajuda">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span>Ajuda</span>
+                </a>
             </nav>
+            
+            <div class="sidebar-footer-brand">
+                <span>Versão 1.2.0</span>
+            </div>
         </aside>
+        
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
-        <!-- Área Principal de Conteúdo -->
-        <section class="content-area">
-            <form id="calculator-form" onsubmit="event.preventDefault();">
+        <!-- 2. CONTEÚDO PRINCIPAL (MAIN CONTENT WRAPPER) -->
+        <main id="main-content" class="main-content">
+            
+            <!-- HEADER SUPERIOR FIXO -->
+            <header id="top-header" class="top-header">
+                <div class="header-left">
+                    <button id="btn-menu-mobile" class="btn-icon btn-burger" aria-label="Abrir menu">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    </button>
+                    <div class="welcome-box">
+                        <span class="header-subtitle">Bem-vindo(a) ao painel</span>
+                        <h2 class="header-title" id="welcome-message">Olá, Profissional!</h2>
+                    </div>
+                </div>
                 
-                <!-- ABA 1: CUSTOS FIXOS -->
-                <div class="tab-content active" id="tab-custos-fixos">
-                    <div class="section-intro">
-                        <span class="step-badge">Passo 01</span>
-                        <h2>Entenda Seus Custos Fixos</h2>
-                        <p>Descreva todos os custos que você tem em seu escritório mensalmente, independente de ter clientes ou não.</p>
-                    </div>
+                <div class="header-right">
+                    <a href="#nova-proposta" class="btn btn-primary btn-nova-proposta" id="btn-quick-proposta">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Nova Proposta
+                    </a>
+                    
+                    <button id="theme-toggle" class="btn-icon" aria-label="Alternar tema escuro/claro">
+                        <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                    
+                    <button id="btn-reset" class="btn btn-secondary btn-sm" type="button">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        Resetar
+                    </button>
 
-                    <div class="search-box-container">
-                        <input type="text" id="fixed-costs-search" placeholder="Buscar custo fixo... (ex: aluguel, INSS, luz)" class="form-input search-input">
-                    </div>
-
-                    <div id="fixed-costs-groups" class="costs-grid">
-                        <!-- Gerado dinamicamente via JS por categorias -->
-                    </div>
-
-                    <div class="custom-cost-adder">
-                        <h3>Adicionar Custo Fixo Personalizado</h3>
-                        <div class="adder-row">
-                            <input type="text" id="custom-fixed-name" placeholder="Nome do custo (ex: Assinatura de Software)" class="form-input">
-                            <select id="custom-fixed-category" class="form-input">
-                                <option value="infra">Infraestrutura e Utilidades</option>
-                                <option value="equipe">Equipe e Salários</option>
-                                <option value="operacional">Operacional e Geral</option>
-                                <option value="conselhos">Anualidades e Conselhos</option>
-                            </select>
-                            <div class="input-currency">
-                                <span class="currency-symbol">R$</span>
-                                <input type="number" id="custom-fixed-value" placeholder="0,00" step="0.01" min="0" class="form-input">
-                            </div>
-                            <button type="button" id="btn-add-fixed" class="btn btn-primary">Adicionar</button>
-                        </div>
-                    </div>
-
-                    <div class="tab-navigation">
-                        <span></span>
-                        <button type="button" class="btn btn-primary btn-next" data-next="produtividade">
-                            Próximo: Produtividade 
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </button>
-                    </div>
+                    <button id="btn-logout" class="btn btn-secondary btn-sm" type="button">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        Sair
+                    </button>
                 </div>
+            </header>
 
-                <!-- ABA 2: PRODUTIVIDADE -->
-                <div class="tab-content" id="tab-produtividade">
-                    <div class="section-intro">
-                        <span class="step-badge">Passo 02</span>
-                        <h2>Entenda sua Produtividade</h2>
-                        <p>Quantas horas de trabalho produtivo (dedicado aos clientes) cada pessoa da sua equipe trabalha em média por dia?</p>
-                    </div>
-
-                    <div class="card card-glass productivity-settings">
-                        <div class="settings-row">
-                            <div class="form-group">
-                                <label for="input-workdays">Dias trabalhados no mês</label>
-                                <span class="label-desc">Número médio de dias produtivos por mês</span>
-                                <input type="number" id="input-workdays" value="20" min="1" max="31" class="form-input">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="productivity-grid">
-                        <div class="card card-glass team-card" id="team-owner">
-                            <div class="team-header">
-                                <div class="team-avatar">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <!-- 3. VIEWS CONTAINER -->
+            <div id="views-container" class="views-container">
+                
+                <!-- VIEW 0: AUTENTICAÇÃO (LOGIN / CADASTRO) -->
+                <section class="view" id="view-login">
+                    <div class="auth-wrapper">
+                        <div class="card card-glass auth-card">
+                            <div class="auth-logo">
+                                <div class="logo-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
                                 </div>
-                                <div>
-                                    <h3>Você / Sócios</h3>
-                                    <p>Proprietários do Escritório</p>
+                                <div class="logo-text">
+                                    <span class="logo-title">Jornada dos Escritórios</span>
+                                    <span class="logo-subtitle">DE SUCE$$O</span>
                                 </div>
                             </div>
-                            <div class="team-body">
+
+                            <div class="auth-tabs">
+                                <button type="button" class="auth-tab active" id="tab-auth-login">Entrar</button>
+                                <button type="button" class="auth-tab" id="tab-auth-signup">Criar Conta</button>
+                            </div>
+
+                            <form id="auth-form" onsubmit="event.preventDefault();">
+                                <div class="form-group" id="group-auth-name" style="display: none;">
+                                    <label for="login-name">Nome Completo</label>
+                                    <input type="text" id="login-name" placeholder="Ex: Ana Clara Silva" class="form-input">
+                                </div>
+
                                 <div class="form-group">
-                                    <label for="hours-owner">Horas de Cliente / Dia</label>
-                                    <input type="number" id="hours-owner" value="6" min="0" max="24" step="0.5" class="form-input hours-input">
+                                    <label for="login-email">E-mail</label>
+                                    <input type="email" id="login-email" placeholder="seuemail@exemplo.com" class="form-input" required>
                                 </div>
+
                                 <div class="form-group">
-                                    <label for="qty-owner">Quantidade de Pessoas</label>
-                                    <input type="number" id="qty-owner" value="1" min="0" class="form-input qty-input">
+                                    <label for="login-password">Senha</label>
+                                    <input type="password" id="login-password" placeholder="••••••••" class="form-input" required minlength="6">
                                 </div>
-                                <div class="calc-subtotal">
-                                    Subtotal: <strong id="subtotal-owner">120h</strong> / mês
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="card card-glass team-card" id="team-collaborators">
-                            <div class="team-header">
-                                <div class="team-avatar">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                                </div>
-                                <div>
-                                    <h3>Colaboradores</h3>
-                                    <p>Arquitetos / Designers CLT ou PJ</p>
-                                </div>
-                            </div>
-                            <div class="team-body">
-                                <div class="form-group">
-                                    <label for="hours-collaborators">Horas de Cliente / Dia</label>
-                                    <input type="number" id="hours-collaborators" value="6" min="0" max="24" step="0.5" class="form-input hours-input">
-                                </div>
-                                <div class="form-group">
-                                    <label for="qty-collaborators">Quantidade de Pessoas</label>
-                                    <input type="number" id="qty-collaborators" value="0" min="0" class="form-input qty-input">
-                                </div>
-                                <div class="calc-subtotal">
-                                    Subtotal: <strong id="subtotal-collaborators">0h</strong> / mês
-                                </div>
-                            </div>
-                        </div>
+                                <div class="auth-feedback" id="auth-message" style="display: none;"></div>
 
-                        <div class="card card-glass team-card" id="team-interns">
-                            <div class="team-header">
-                                <div class="team-avatar">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                                <button type="submit" id="btn-submit-auth" class="btn btn-primary btn-block" style="margin-top: 10px;">
+                                    Entrar
+                                </button>
+                                
+                                <div class="auth-actions" style="margin-top: 16px; display: flex; flex-direction: column; gap: 8px; align-items: center;">
+                                    <a href="#" id="link-recover-password" style="font-size: 0.8rem; color: var(--text-muted); text-decoration: none;">Esqueceu sua senha?</a>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted);">ou</span>
+                                    <button type="button" id="btn-demo-auth" class="btn btn-secondary btn-sm btn-block" style="font-size: 0.75rem;">
+                                        Acessar modo Demonstração sem login
+                                    </button>
                                 </div>
-                                <div>
-                                    <h3>Estagiários</h3>
-                                    <p>Estudantes em treinamento</p>
-                                </div>
-                            </div>
-                            <div class="team-body">
-                                <div class="form-group">
-                                    <label for="hours-interns">Horas de Cliente / Dia</label>
-                                    <input type="number" id="hours-interns" value="4" min="0" max="24" step="0.5" class="form-input hours-input">
-                                </div>
-                                <div class="form-group">
-                                    <label for="qty-interns">Quantidade de Pessoas</label>
-                                    <input type="number" id="qty-interns" value="2" min="0" class="form-input qty-input">
-                                </div>
-                                <div class="calc-subtotal">
-                                    Subtotal: <strong id="subtotal-interns">160h</strong> / mês
-                                </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
+                </section>
 
-                    <div class="tab-navigation">
-                        <button type="button" class="btn btn-secondary btn-prev" data-prev="custos-fixos">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                            Anterior
-                        </button>
-                        <button type="button" class="btn btn-primary btn-next" data-next="custo-hora">
-                            Próximo: Custo da Hora
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- ABA 3: CUSTO DA HORA -->
-                <div class="tab-content" id="tab-custo-hora">
+                <!-- VIEW 1: DASHBOARD -->
+                <section class="view" id="view-dashboard">
                     <div class="section-intro">
-                        <span class="step-badge">Passo 03</span>
-                        <h2>Entenda o Custo da sua Hora de Trabalho</h2>
-                        <p>Sua hora trabalhada é a relação entre os seus custos fixos e o número total de horas produtivas trabalhadas por toda a sua equipe durante um mês.</p>
+                        <span class="step-badge">Dashboard</span>
+                        <h2>Visão Geral do Escritório</h2>
+                        <p>Acompanhe o desempenho financeiro, status de propostas e indicadores de produtividade do seu negócio.</p>
                     </div>
-
-                    <div class="card card-glass hourly-rate-math">
-                        <div class="math-box">
-                            <div class="math-element">
-                                <span class="math-title">Custos Fixos</span>
-                                <span class="math-val" id="math-fixed-cost">R$ 10.000,00</span>
+                    
+                    <div class="dashboard-widgets-grid">
+                        <div class="card card-glass widget-card">
+                            <div class="widget-header">
+                                <span class="widget-label">Valor Hora Atual</span>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-purple"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                             </div>
-                            <div class="math-operator">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><circle cx="12" cy="6" r="1.5"/><circle cx="12" cy="18" r="1.5"/></svg>
+                            <span class="widget-val highlight-text" id="dash-hourly-rate">R$ 0,00</span>
+                            <p class="widget-desc">Calculado a partir das despesas e capacidade horária.</p>
+                        </div>
+                        
+                        <div class="card card-glass widget-card">
+                            <div class="widget-header">
+                                <span class="widget-label">Custos Fixos Mensais</span>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-warning"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                             </div>
-                            <div class="math-element">
-                                <span class="math-title">Horas Produtivas / Mês</span>
-                                <span class="math-val" id="math-hours-capacity">200h</span>
+                            <span class="widget-val" id="dash-fixed-costs">R$ 0,00</span>
+                            <p class="widget-desc">Despesa total operacional mensal fixada.</p>
+                        </div>
+                        
+                        <div class="card card-glass widget-card">
+                            <div class="widget-header">
+                                <span class="widget-label">Propostas Ativas</span>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-success"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><polyline points="10 9 9 9 8 9"/></svg>
                             </div>
-                            <div class="math-operator">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/></svg>
-                            </div>
-                            <div class="math-element result-element">
-                                <span class="math-title">Custo do seu Valor Hora</span>
-                                <span class="math-val highlight-text" id="math-hourly-rate">R$ 50,00</span>
-                            </div>
+                            <span class="widget-val" id="dash-saved-count">0</span>
+                            <p class="widget-desc">Propostas salvas no banco de simulações.</p>
                         </div>
                     </div>
 
-                    <div class="card card-glass info-card">
-                        <div class="info-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                        </div>
-                        <div class="info-text">
-                            <h4>O que este valor significa?</h4>
-                            <p>Este é o seu <strong>custo de sobrevivência por hora</strong>. Cada hora que você ou qualquer pessoa da sua equipe passa trabalhando em um projeto custa exatamente esse valor para manter o escritório funcionando. Cobrar menos do que isso significa ter prejuízo operacional imediato.</p>
-                        </div>
-                    </div>
-
-                    <div class="tab-navigation">
-                        <button type="button" class="btn btn-secondary btn-prev" data-prev="produtividade">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                            Anterior
-                        </button>
-                        <button type="button" class="btn btn-primary btn-next" data-next="horas-projeto">
-                            Próximo: Horas do Projeto
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- ABA 4: HORAS DO PROJETO -->
-                <div class="tab-content" id="tab-horas-projeto">
-                    <div class="section-intro">
-                        <span class="step-badge">Passo 04</span>
-                        <h2>Estimativa de Custo de Horas do Projeto</h2>
-                        <p>Estime o número de horas que você irá gastar para realizar cada etapa de determinado projeto.</p>
-                    </div>
-
-                    <div class="card card-glass project-phases-card">
-                        <div class="table-responsive">
-                            <table class="phases-table">
-                                <thead>
-                                    <tr>
-                                        <th>Etapa do Projeto</th>
-                                        <th style="width: 150px;">Horas Estimadas</th>
-                                        <th style="width: 180px;">Custo da Etapa (R$)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="project-phases-list">
-                                    <!-- Gerado dinamicamente via JS -->
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="custom-phase-adder">
-                            <h4>Adicionar Etapa Personalizada</h4>
-                            <div class="adder-row">
-                                <input type="text" id="custom-phase-name" placeholder="Nome da etapa (ex: Design de Mobiliário)" class="form-input">
-                                <input type="number" id="custom-phase-hours" placeholder="Horas" min="0" class="form-input">
-                                <button type="button" id="btn-add-phase" class="btn btn-secondary">Adicionar</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tab-navigation">
-                        <button type="button" class="btn btn-secondary btn-prev" data-prev="custo-hora">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                            Anterior
-                        </button>
-                        <button type="button" class="btn btn-primary btn-next" data-next="custos-variaveis">
-                            Próximo: Custos Variáveis
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- ABA 5: CUSTOS VARIÁVEIS -->
-                <div class="tab-content" id="tab-custos-variaveis">
-                    <div class="section-intro">
-                        <span class="step-badge">Passo 05</span>
-                        <h2>Entenda os Custos Variáveis do Trabalho Entregue</h2>
-                        <p>Estes custos só existirão se você estiver executando este projeto especificamente para este cliente.</p>
-                    </div>
-
-                    <div class="card card-glass variables-card">
-                        <div class="table-responsive">
-                            <table class="variables-table">
-                                <thead>
-                                    <tr>
-                                        <th>Custo Variável / Despesa Extra</th>
-                                        <th style="width: 200px;">Valor (R$)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="variable-costs-list">
-                                    <!-- Gerado dinamicamente via JS -->
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="custom-variable-adder">
-                            <h4>Adicionar Custo Variável Personalizado</h4>
-                            <div class="adder-row">
-                                <input type="text" id="custom-var-name" placeholder="Ex: Maquete Eletrônica 3D Terceirizada" class="form-input">
-                                <div class="input-currency">
-                                    <span class="currency-symbol">R$</span>
-                                    <input type="number" id="custom-var-value" placeholder="0,00" step="0.01" min="0" class="form-input">
-                                </div>
-                                <button type="button" id="btn-add-variable" class="btn btn-secondary">Adicionar</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tab-navigation">
-                        <button type="button" class="btn btn-secondary btn-prev" data-prev="horas-projeto">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                            Anterior
-                        </button>
-                        <button type="button" class="btn btn-primary btn-next" data-next="lucro-imposto">
-                            Próximo: Lucro e Imposto
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- ABA 6: LUCRO E IMPOSTO -->
-                <div class="tab-content" id="tab-lucro-imposto">
-                    <div class="section-intro">
-                        <span class="step-badge">Passo 06 & 07</span>
-                        <h2>Lucro Desejado e Impostos</h2>
-                        <p>Adicione o percentual de margem de lucro que você deseja obter e a alíquota tributária para emissão da nota fiscal.</p>
-                    </div>
-
-                    <div class="pricing-factors-grid">
-                        <div class="card card-glass slider-card">
-                            <div class="slider-header">
-                                <h3>#6 Margem de Lucro Desejada</h3>
-                                <span class="value-display" id="profit-display">30%</span>
-                            </div>
-                            <p class="slider-desc">Recomendado entre 20% e 35% em cima dos custos totais.</p>
-                            <input type="range" id="input-profit" min="0" max="100" value="30" step="1" class="form-range">
-                            <div class="slider-ticks">
-                                <span>0%</span>
-                                <span>20%</span>
-                                <span>30%</span>
-                                <span>35%</span>
-                                <span>50%</span>
-                                <span>100%</span>
-                            </div>
-                        </div>
-
-                        <div class="card card-glass tax-card">
-                            <div class="slider-header">
-                                <h3>#7 Imposto Recolhido</h3>
-                                <span class="value-display" id="tax-display">6%</span>
-                            </div>
-                            <p class="slider-desc">Varia entre 6% a 15% (Simples Nacional) ou 27.5% (Autônomo/Pessoa Física).</p>
-                            <input type="range" id="input-tax" min="0" max="40" value="6" step="0.5" class="form-range">
-                            
-                            <div class="tax-method-selector">
-                                <label class="method-label">Método de Cálculo do Imposto:</label>
-                                <div class="radio-group">
-                                    <label class="radio-container">
-                                        <input type="radio" name="tax-method" value="inside" checked>
-                                        <span class="checkmark"></span>
-                                        <div>
-                                            <strong>Por Dentro (Recomendado)</strong>
-                                            <span class="method-desc">O imposto incide sobre o valor final da nota. O imposto é deduzido do faturamento bruto.</span>
-                                        </div>
-                                    </label>
-                                    <label class="radio-container">
-                                        <input type="radio" name="tax-method" value="outside">
-                                        <span class="checkmark"></span>
-                                        <div>
-                                            <strong>Markup Simples (Por Fora)</strong>
-                                            <span class="method-desc">Aplica a porcentagem direto sobre os custos + lucro.</span>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tab-navigation">
-                        <button type="button" class="btn btn-secondary btn-prev" data-prev="custos-variaveis">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                            Anterior
-                        </button>
-                        <button type="button" class="btn btn-primary btn-next" data-next="resultado">
-                            Ver Proposta Final
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- ABA 7: RESULTADO FINAL -->
-                <div class="tab-content" id="tab-resultado">
-                    <div class="section-intro">
-                        <span class="step-badge">Resumo</span>
-                        <h2>Relatório de Orçamento do Projeto</h2>
-                        <p>Visualize o detalhamento de custos, lucro e impostos para apresentar sua proposta.</p>
-                    </div>
-
-                    <div class="proposal-container card card-glass" id="proposal-report">
-                        <div class="proposal-header">
-                            <div class="proposal-logo">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
-                                    <path d="M2 17L12 22L22 17"/>
-                                    <path d="M2 12L12 17L22 12"/>
-                                </svg>
-                                <span>JORNADA DOS ESCRITÓRIOS DE SUCE$$O</span>
-                            </div>
-                            <div class="proposal-meta">
-                                <h3>PROPOSTA DE PRECIFICAÇÃO</h3>
-                                <p>Data: <span id="report-date">23/07/2026</span></p>
-                            </div>
-                        </div>
-
-                        <div class="proposal-body">
-                            <div class="report-section">
-                                <h4>1. Estrutura Operacional</h4>
-                                <div class="report-grid">
-                                    <div class="report-item">
-                                        <span class="report-label">Custo Fixo Total do Escritório:</span>
-                                        <span class="report-val" id="rep-fixed-costs">R$ 0,00</span>
-                                    </div>
-                                    <div class="report-item">
-                                        <span class="report-label">Capacidade Produtiva da Equipe:</span>
-                                        <span class="report-val" id="rep-monthly-hours">0h / mês</span>
-                                    </div>
-                                    <div class="report-item">
-                                        <span class="report-label">Custo Unitário da Hora:</span>
-                                        <span class="report-val font-highlight" id="rep-hourly-rate">R$ 0,00 / h</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="report-section">
-                                <h4>2. Custos Dedicados ao Projeto</h4>
-                                <div class="report-grid">
-                                    <div class="report-item">
-                                        <span class="report-label">Horas Estimadas do Projeto:</span>
-                                        <span class="report-val" id="rep-project-hours">0h</span>
-                                    </div>
-                                    <div class="report-item">
-                                        <span class="report-label">Custo de Horas de Trabalho:</span>
-                                        <span class="report-val" id="rep-project-hours-cost">R$ 0,00</span>
-                                    </div>
-                                    <div class="report-item">
-                                        <span class="report-label">Custos Variáveis / Despesas:</span>
-                                        <span class="report-val" id="rep-project-variables">R$ 0,00</span>
-                                    </div>
-                                    <div class="report-item total-cost-item">
-                                        <span class="report-label">Custo Total de Execução (Hora + Variáveis):</span>
-                                        <span class="report-val" id="rep-project-total-cost">R$ 0,00</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="report-section">
-                                <h4>3. Formação do Preço de Venda</h4>
-                                <div class="report-table-container">
-                                    <table class="report-table">
-                                        <tbody>
-                                            <tr>
-                                                <td>Custo Total do Projeto</td>
-                                                <td class="text-right" id="row-costs">R$ 0,00</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Lucro Desejado (<span id="rep-profit-pct">0%</span>)</td>
-                                                <td class="text-right text-success" id="row-profit">R$ 0,00</td>
-                                            </tr>
-                                            <tr class="subtotal-row">
-                                                <td>Subtotal (Custos + Lucro)</td>
-                                                <td class="text-right" id="row-subtotal">R$ 0,00</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Impostos Recolhidos (<span id="rep-tax-pct">0%</span>)</td>
-                                                <td class="text-right text-warning" id="row-tax">R$ 0,00</td>
-                                            </tr>
-                                            <tr class="final-price-row">
-                                                <td>Preço Sugerido da Proposta (Final)</td>
-                                                <td class="text-right text-primary" id="row-final-price">R$ 0,00</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div class="report-section visual-summary">
-                                <h4>Composição do Preço Final</h4>
-                                <div class="chart-flex">
-                                    <div class="chart-container">
-                                        <!-- Custom Dynamic SVG Donut Chart -->
-                                        <svg id="svg-donut" width="200" height="200" viewBox="0 0 200 200">
-                                            <circle cx="100" cy="100" r="70" class="donut-bg" fill="none" stroke-width="20" />
-                                            <!-- SVG segments will be injected here -->
-                                            <text x="100" y="95" class="donut-text-price" text-anchor="middle" id="donut-center-price">R$ 0</text>
-                                            <text x="100" y="120" class="donut-text-label" text-anchor="middle">Valor Total</text>
-                                        </svg>
-                                    </div>
-                                    <div class="chart-legend" id="donut-legend">
-                                        <!-- Legend generated dynamically -->
-                                    </div>
-                                </div>
+                    <div class="dashboard-details-row">
+                        <div class="card card-glass list-details-widget">
+                            <h3>Gestão e Operações Rápidas</h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 20px;">Use os atalhos abaixo para gerenciar os dados auxiliares que compõem suas propostas.</p>
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                                <a href="#nova-proposta" class="btn btn-primary">Criar Orçamento</a>
+                                <a href="#clientes" class="btn btn-secondary">Cadastrar Clientes</a>
+                                <a href="#servicos" class="btn btn-secondary">Definir Serviços</a>
                             </div>
                         </div>
                         
-                        <div class="proposal-footer">
-                            <p><strong>Atenção:</strong> O valor calculado é uma estimativa baseada nas premissas de custo fixo, produtividade informada e escopo desenhado. Modificações nas etapas do projeto acarretarão readequações de valores.</p>
+                        <div class="card card-glass alert-dashboard-widget">
+                            <h3>Distribuição dos Orçamentos</h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 12px;">Proporção de propostas por status.</p>
+                            <div class="chart-flex" style="display: flex; align-items: center; gap: 20px;">
+                                <div class="chart-container">
+                                    <svg id="dash-svg-donut" width="120" height="120" viewBox="0 0 200 200">
+                                        <circle cx="100" cy="100" r="70" class="donut-bg" fill="none" stroke-width="20" stroke="rgba(255,255,255,0.05)" />
+                                        <text x="100" y="95" class="donut-text-price" text-anchor="middle" id="dash-donut-center-total" style="font-size: 1.8rem; font-weight: 700; fill: var(--text-contrast);">0</text>
+                                        <text x="100" y="120" class="donut-text-label" text-anchor="middle" style="font-size: 0.85rem; fill: var(--text-muted);">Total</text>
+                                    </svg>
+                                </div>
+                                <div class="chart-legend" id="dash-donut-legend" style="display: flex; flex-direction: column; gap: 8px; flex: 1;">
+                                    <!-- Legend generated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 2: FINANCEIRO -->
+                <section class="view" id="view-financeiro">
+                    <div class="section-intro">
+                        <span class="step-badge">Financeiro</span>
+                        <h2>Custos Fixos e Produtividade</h2>
+                        <p>Gerencie as despesas fixas do escritório e configure a capacidade da equipe para obter o seu valor/hora real.</p>
+                    </div>
+                    
+                    <!-- Destaque do Valor Hora Calculado -->
+                    <div class="card card-glass hourly-rate-math" style="margin-bottom: 24px;">
+                        <span class="step-badge">Valor Hora Calculado</span>
+                        <div class="math-box">
+                            <div class="math-element">
+                                <span class="math-title">Custos Fixos</span>
+                                <span class="math-val" id="fin-math-fixed">R$ 0,00</span>
+                            </div>
+                            <div class="math-operator">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><circle cx="12" cy="6" r="1.5"/><circle cx="12" cy="18" r="1.5"/></svg>
+                            </div>
+                            <div class="math-element">
+                                <span class="math-title">Horas Produtivas / Mês</span>
+                                <span class="math-val" id="fin-math-hours">0h</span>
+                            </div>
+                            <div class="math-operator">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/></svg>
+                            </div>
+                            <div class="math-element result-element">
+                                <span class="math-title">Valor da Sua Hora</span>
+                                <span class="math-val highlight-text" id="fin-math-rate">R$ 0,00</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="action-buttons-row">
-                        <button type="button" id="btn-save-project" class="btn btn-success">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                            Salvar Projeto
-                        </button>
-                        <button type="button" id="btn-export-pdf" class="btn btn-primary">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                            Imprimir / Salvar PDF
-                        </button>
-                    </div>
+                    <div class="dashboard-details-row" style="grid-template-columns: 1.6fr 1fr; align-items: start; margin-bottom: 24px;">
+                        <!-- Custos Fixos Column -->
+                        <div class="fixed-costs-manager" style="display: flex; flex-direction: column; gap: 20px;">
+                            <div class="card card-glass">
+                                <h3>Gerenciar Custos Fixos</h3>
+                                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">Adicione ou modifique os custos recorrentes do seu escritório.</p>
+                                <div class="search-box-container" style="margin-bottom: 16px;">
+                                    <input type="text" id="fin-costs-search" placeholder="Filtrar custo fixo... (ex: aluguel, luz)" class="form-input search-input">
+                                </div>
+                                <div id="fin-costs-groups" class="costs-grid">
+                                    <!-- Rendered dynamically -->
+                                </div>
+                            </div>
+                            
+                            <div class="card card-glass custom-cost-adder" style="margin-top: 0;">
+                                <h3>Adicionar Custo Fixo</h3>
+                                <div class="adder-row">
+                                    <input type="text" id="fin-custom-name" placeholder="Ex: Assinatura Adobe" class="form-input">
+                                    <select id="fin-custom-category" class="form-input">
+                                        <option value="infra">Infraestrutura e Utilidades</option>
+                                        <option value="equipe">Equipe e Salários</option>
+                                        <option value="operacional">Operacional e Geral</option>
+                                        <option value="conselhos">Anualidades e Conselhos</option>
+                                    </select>
+                                    <div class="input-currency">
+                                        <span class="currency-symbol">R$</span>
+                                        <input type="number" id="fin-custom-value" placeholder="0,00" step="0.01" class="form-input">
+                                    </div>
+                                    <button type="button" id="fin-btn-add-fixed" class="btn btn-primary">Adicionar</button>
+                                </div>
+                            </div>
+                        </div>
 
-                    <!-- Lista de Projetos Salvos -->
-                    <div class="saved-projects-section card card-glass">
-                        <h3>Simulações Salvas</h3>
-                        <div id="saved-projects-list" class="saved-projects-grid">
-                            <!-- Injetado dinamicamente -->
-                            <p class="empty-state">Nenhuma simulação salva ainda. Configure e clique em "Salvar Projeto" acima.</p>
+                        <!-- Produtividade / Equipe Column -->
+                        <div class="productivity-manager" style="display: flex; flex-direction: column; gap: 20px;">
+                            <div class="card card-glass">
+                                <h3>Dias Trabalhados</h3>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="fin-input-workdays">Dias produtivos / Mês</label>
+                                    <input type="number" id="fin-input-workdays" value="20" min="1" max="31" class="form-input">
+                                </div>
+                            </div>
+                            
+                            <div class="card card-glass team-card" style="width: 100%;">
+                                <div class="team-header">
+                                    <div class="team-avatar">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </div>
+                                    <div>
+                                        <h3>Você / Sócios</h3>
+                                        <p>Subtotal: <strong id="fin-subtotal-owner">120h</strong>/mês</p>
+                                    </div>
+                                </div>
+                                <div class="team-body">
+                                    <div class="form-group">
+                                        <label for="fin-hours-owner">Horas de Cliente / Dia</label>
+                                        <input type="number" id="fin-hours-owner" value="6" min="0" max="24" step="0.5" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="fin-qty-owner">Quantidade de Sócios</label>
+                                        <input type="number" id="fin-qty-owner" value="1" min="0" class="form-input">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card card-glass team-card" style="width: 100%;">
+                                <div class="team-header">
+                                    <div class="team-avatar" style="color: var(--color-accent); background: var(--color-accent-glow);">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                    </div>
+                                    <div>
+                                        <h3>Colaboradores</h3>
+                                        <p>Subtotal: <strong id="fin-subtotal-collaborators">0h</strong>/mês</p>
+                                    </div>
+                                </div>
+                                <div class="team-body">
+                                    <div class="form-group">
+                                        <label for="fin-hours-collaborators">Horas de Cliente / Dia</label>
+                                        <input type="number" id="fin-hours-collaborators" value="6" min="0" max="24" step="0.5" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="fin-qty-collaborators">Quantidade de Pessoas</label>
+                                        <input type="number" id="fin-qty-collaborators" value="0" min="0" class="form-input">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card card-glass team-card" style="width: 100%;">
+                                <div class="team-header">
+                                    <div class="team-avatar" style="color: var(--color-success); background: rgba(6, 214, 160, 0.1);">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                                    </div>
+                                    <div>
+                                        <h3>Estagiários</h3>
+                                        <p>Subtotal: <strong id="fin-subtotal-interns">160h</strong>/mês</p>
+                                    </div>
+                                </div>
+                                <div class="team-body">
+                                    <div class="form-group">
+                                        <label for="fin-hours-interns">Horas de Cliente / Dia</label>
+                                        <input type="number" id="fin-hours-interns" value="4" min="0" max="24" step="0.5" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="fin-qty-interns">Quantidade de Estagiários</label>
+                                        <input type="number" id="fin-qty-interns" value="2" min="0" class="form-input">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </section>
 
-            </form>
-        </section>
-
-        <!-- Sidebar Direita: Painel Resumo Fixo (Sticky) -->
-        <aside class="sidebar-summary">
-            <div class="card card-glass summary-sticky-card">
-                <h3>Resumo Financeiro</h3>
-                
-                <div class="summary-stat">
-                    <span class="stat-label">Custo Fixo Mensal</span>
-                    <span class="stat-value" id="summary-fixed-costs">R$ 0,00</span>
-                </div>
-                
-                <div class="summary-stat">
-                    <span class="stat-label">Valor Hora</span>
-                    <span class="stat-value text-purple" id="summary-hourly-rate">R$ 0,00</span>
-                    <span class="stat-sub" id="summary-hours-desc">baseado em 0h/mês</span>
-                </div>
-
-                <hr class="summary-divider">
-
-                <div class="summary-stat">
-                    <span class="stat-label">Custos do Projeto</span>
-                    <div class="project-mini-breakdown">
-                        <div>
-                            <span>Horas (<span id="summary-proj-hours">0h</span>)</span>
-                            <span id="summary-proj-hours-cost">R$ 0,00</span>
+                <!-- VIEW 3: CLIENTES -->
+                <section class="view" id="view-clientes">
+                    <div class="section-intro">
+                        <span class="step-badge">Clientes</span>
+                        <h2>Gestão de Clientes</h2>
+                        <p>Mantenha um cadastro dos seus clientes para associar rapidamente às propostas comerciais.</p>
+                    </div>
+                    
+                    <div class="dashboard-details-row" style="grid-template-columns: 1fr 1.6fr; align-items: start;">
+                        <!-- Cadastro de Clientes -->
+                        <div class="card card-glass">
+                            <h3 id="client-form-title">Cadastrar Novo Cliente</h3>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Insira os dados cadastrais básicos abaixo.</p>
+                            
+                            <form id="client-form" onsubmit="event.preventDefault();">
+                                <input type="hidden" id="client-edit-id" value="">
+                                
+                                <div class="form-group">
+                                    <label for="client-name">Nome Completo</label>
+                                    <input type="text" id="client-name" placeholder="Ex: Ana Clara Silva" class="form-input" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="client-email">E-mail</label>
+                                    <input type="email" id="client-email" placeholder="Ex: ana.silva@email.com" class="form-input">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="client-phone">Telefone / WhatsApp</label>
+                                    <input type="text" id="client-phone" placeholder="Ex: (11) 98765-4321" class="form-input">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="client-notes">Observações</label>
+                                    <textarea id="client-notes" placeholder="Notas sobre o cliente ou projeto (Ex: Terreno em declive, condomínio fechado)" class="form-input" style="min-height: 80px; resize: vertical;"></textarea>
+                                </div>
+                                
+                                <div style="display: flex; gap: 12px; margin-top: 10px;">
+                                    <button type="submit" id="btn-save-client" class="btn btn-primary" style="flex: 1;">Salvar Cliente</button>
+                                    <button type="button" id="btn-cancel-client-edit" class="btn btn-secondary" style="display: none;">Cancelar</button>
+                                </div>
+                            </form>
                         </div>
-                        <div>
-                            <span>Variáveis</span>
-                            <span id="summary-proj-vars">R$ 0,00</span>
+                        
+                        <!-- Lista de Clientes -->
+                        <div class="card card-glass">
+                            <h3>Clientes Cadastrados</h3>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Visualize e gerencie a lista de clientes cadastrados.</p>
+                            
+                            <div class="table-responsive">
+                                <table class="phases-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>Contato</th>
+                                            <th>Observações</th>
+                                            <th style="width: 100px; text-align: center;">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="clients-table-body">
+                                        <!-- Injected dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </section>
 
-                <div class="summary-stat">
-                    <span class="stat-label">Lucro do Projeto</span>
-                    <span class="stat-value text-success" id="summary-profit">R$ 0,00</span>
-                </div>
+                <!-- VIEW 4: SERVIÇOS -->
+                <section class="view" id="view-servicos">
+                    <div class="section-intro">
+                        <span class="step-badge">Serviços</span>
+                        <h2>Catálogo de Serviços</h2>
+                        <p>Configure os escopos de serviços padrão do seu escritório para agilizar o preenchimento de propostas.</p>
+                    </div>
+                    
+                    <div class="dashboard-details-row" style="grid-template-columns: 1fr 1.6fr; align-items: start;">
+                        <!-- Cadastro de Serviços -->
+                        <div class="card card-glass">
+                            <h3 id="service-form-title">Cadastrar Novo Serviço</h3>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Defina a atividade e o tempo padrão estimado.</p>
+                            
+                            <form id="service-form" onsubmit="event.preventDefault();">
+                                <input type="hidden" id="service-edit-id" value="">
+                                
+                                <div class="form-group">
+                                    <label for="service-name">Nome do Serviço / Etapa</label>
+                                    <input type="text" id="service-name" placeholder="Ex: Detalhamento Executivo" class="form-input" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="service-hours">Horas Padrão Estimadas</label>
+                                    <input type="number" id="service-hours" placeholder="Ex: 40" class="form-input" min="0" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="service-desc">Descrição / Escopo do Serviço</label>
+                                    <textarea id="service-desc" placeholder="Descreva o que está incluso (Ex: Detalhamento de marcenaria, vistas e especificações)" class="form-input" style="min-height: 100px; resize: vertical;"></textarea>
+                                </div>
+                                
+                                <div style="display: flex; gap: 12px; margin-top: 10px;">
+                                    <button type="submit" id="btn-save-service" class="btn btn-primary" style="flex: 1;">Salvar Serviço</button>
+                                    <button type="button" id="btn-cancel-service-edit" class="btn btn-secondary" style="display: none;">Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Lista de Serviços -->
+                        <div class="card card-glass">
+                            <h3>Serviços Cadastrados</h3>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Seus escopos padrão cadastrados no escritório.</p>
+                            
+                            <div class="table-responsive">
+                                <table class="phases-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome do Serviço</th>
+                                            <th style="width: 120px;">Horas Padrão</th>
+                                            <th>Descrição / Notas</th>
+                                            <th style="width: 100px; text-align: center;">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="services-table-body">
+                                        <!-- Injected dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-                <div class="summary-stat">
-                    <span class="stat-label">Imposto Estimado</span>
-                    <span class="stat-value text-warning" id="summary-tax">R$ 0,00</span>
-                </div>
+                <!-- VIEW 5: HISTÓRICO / LEADS (Orçamentos Salvos) -->
+                <section class="view" id="view-historico">
+                    <div class="section-intro">
+                        <span class="step-badge">Histórico</span>
+                        <h2>Registro de Propostas</h2>
+                        <p>Visualize e gerencie a lista de orçamentos e simulações financeiras salvas na sua conta.</p>
+                    </div>
+                    
+                    <div class="card card-glass">
+                        <h3>Simulações e Status das Propostas</h3>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Clique em uma simulação para carregá-la na calculadora ou exclua propostas obsoletas.</p>
+                        
+                        <div id="history-projects-list" class="saved-projects-grid">
+                            <!-- Rendered dynamically -->
+                            <p class="empty-state">Nenhuma simulação salva ainda. Crie e salve um orçamento no módulo **Nova Proposta**.</p>
+                        </div>
+                    </div>
+                </section>
 
-                <div class="summary-stat final-stat">
-                    <span class="stat-label">Preço Final Sugerido</span>
-                    <span class="stat-value text-gradient" id="summary-final-price">R$ 0,00</span>
-                </div>
+                <!-- VIEW 6: PERFIL -->
+                <section class="view" id="view-perfil">
+                    <div class="section-intro">
+                        <span class="step-badge">Perfil</span>
+                        <h2>Dados do Profissional / Escritório</h2>
+                        <p>Configure os dados institucionais que serão inseridos automaticamente nas suas propostas financeiras.</p>
+                    </div>
+                    
+                    <div class="dashboard-details-row" style="grid-template-columns: 1fr 1.2fr; align-items: start;">
+                        <!-- Formulário de Perfil -->
+                        <div class="card card-glass">
+                            <h3>Informações de Contato</h3>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Esses dados serão inseridos no cabeçalho das propostas impressas.</p>
+                            
+                            <form id="profile-form" onsubmit="event.preventDefault();">
+                                <div class="form-group">
+                                    <label for="profile-office-name">Nome do Escritório</label>
+                                    <input type="text" id="profile-office-name" placeholder="Ex: Studio Aliança Arquitetura" class="form-input" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="profile-owner-name">Responsável Técnico / Profissional</label>
+                                    <input type="text" id="profile-owner-name" placeholder="Ex: Luana Silvestre (CAU A1234-5)" class="form-input">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="profile-email">E-mail Comercial</label>
+                                    <input type="email" id="profile-email" placeholder="Ex: contato@studioalianca.com.br" class="form-input">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="profile-phone">Telefone / Celular comercial</label>
+                                    <input type="text" id="profile-phone" placeholder="Ex: (11) 91234-5678" class="form-input">
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Salvar Perfil</button>
+                            </form>
+                        </div>
+                        
+                        <!-- Visualização da Identidade -->
+                        <div class="card card-glass placeholder-card" style="padding: 40px; height: 100%; justify-content: flex-start;">
+                            <div class="placeholder-icon text-purple">
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                            </div>
+                            <h3>Sua Proposta Personalizada</h3>
+                            <p style="text-align: left; font-size: 0.9rem;">Preencher o perfil garante que o cabeçalho do documento de orçamentos se adapte com sua assinatura corporativa automática.</p>
+                            
+                            <div class="card" style="width: 100%; background: rgba(0,0,0,0.15); border: 1px solid var(--border-glass); margin-top: 15px; padding: 16px; border-radius: var(--border-radius-md); text-align: left;">
+                                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-glass); padding-bottom: 8px; margin-bottom: 8px;">
+                                    <span style="font-weight: 700; font-size: 0.8rem;" id="preview-prof-office">NOME DO ESCRITÓRIO</span>
+                                    <span style="font-size: 0.8rem; color: var(--text-muted);">PROPOSTA</span>
+                                </div>
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.5;">
+                                    <div>Responsável: <strong id="preview-prof-owner">-</strong></div>
+                                    <div>Contato: <span id="preview-prof-contact">-</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-                <div class="checklist-tracker">
-                    <h4>Checklist do Orçamento</h4>
-                    <ul class="tracker-list">
-                        <li class="tracker-item" id="chk-fixed">
-                            <span class="tracker-icon"></span>
-                            Custos fixos informados
-                        </li>
-                        <li class="tracker-item" id="chk-productivity">
-                            <span class="tracker-icon"></span>
-                            Produtividade definida
-                        </li>
-                        <li class="tracker-item" id="chk-hours">
-                            <span class="tracker-icon"></span>
-                            Horas do projeto estimadas
-                        </li>
-                        <li class="tracker-item" id="chk-margin">
-                            <span class="tracker-icon"></span>
-                            Margem & imposto definidos
-                        </li>
-                    </ul>
-                </div>
-                
-                <button type="button" class="btn btn-primary btn-block btn-go-final">
-                    Ver Relatório Completo
-                </button>
+                <!-- VIEW 7: CONFIGURAÇÕES -->
+                <section class="view" id="view-configuracoes">
+                    <div class="section-intro">
+                        <span class="step-badge">Configurações</span>
+                        <h2>Preferências Globais</h2>
+                        <p>Configure opções gerais de comportamento e taxas fiscais padrões da plataforma.</p>
+                    </div>
+                    
+                    <div class="card card-glass placeholder-card">
+                        <div class="placeholder-icon text-purple">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        </div>
+                        <h3>Preferências do Sistema (Breve)</h3>
+                        <p>Customize parâmetros como moeda base, backup automático de dados e vinculação de chaves com outras ferramentas.</p>
+                    </div>
+                </section>
+
+                <!-- VIEW 8: AJUDA -->
+                <section class="view" id="view-ajuda">
+                    <div class="section-intro">
+                        <span class="step-badge">Ajuda</span>
+                        <h2>Suporte e Documentação</h2>
+                        <p>Aprenda a precificar da forma certa e confira as melhores práticas do método.</p>
+                    </div>
+                    
+                    <div class="card card-glass placeholder-card">
+                        <div class="placeholder-icon text-purple">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        </div>
+                        <h3>Documentação do Usuário (Breve)</h3>
+                        <p>Vídeos explicativos, perguntas frequentes e suporte direto com a central da **Jornada dos Escritórios de Sucesso**.</p>
+                    </div>
+                </section>
+
+                <!-- VIEW 9: NOVA PROPOSTA (CALCULADORA COMPLETA) -->
+                <section class="view" id="view-nova-proposta">
+                    
+                    <div class="app-container" style="padding: 0; max-width: 100%; margin: 0; width: 100%;">
+                        
+                        <!-- Sidebar de Navegação dos Passos da Calculadora -->
+                        <aside class="sidebar-nav">
+                            <div class="nav-title">Passos da Precificação</div>
+                            <nav class="steps-menu">
+                                <button class="step-link active" data-tab="custos-fixos" id="step-btn-1" type="button">
+                                    <span class="step-num">01</span>
+                                    <span class="step-label">Custos Fixos</span>
+                                </button>
+                                <button class="step-link" data-tab="produtividade" id="step-btn-2" type="button">
+                                    <span class="step-num">02</span>
+                                    <span class="step-label">Produtividade</span>
+                                </button>
+                                <button class="step-link" data-tab="custo-hora" id="step-btn-3" type="button">
+                                    <span class="step-num">03</span>
+                                    <span class="step-label">Custo da Hora</span>
+                                </button>
+                                <button class="step-link" data-tab="horas-projeto" id="step-btn-4" type="button">
+                                    <span class="step-num">04</span>
+                                    <span class="step-label">Horas do Projeto</span>
+                                </button>
+                                <button class="step-link" data-tab="custos-variaveis" id="step-btn-5" type="button">
+                                    <span class="step-num">05</span>
+                                    <span class="step-label">Custos Variáveis</span>
+                                </button>
+                                <button class="step-link" data-tab="lucro-imposto" id="step-btn-6" type="button">
+                                    <span class="step-num">06</span>
+                                    <span class="step-label">Lucro e Imposto</span>
+                                </button>
+                                <button class="step-link" data-tab="resultado" id="step-btn-7" type="button">
+                                    <span class="step-num">07</span>
+                                    <span class="step-label">Proposta Final</span>
+                                </button>
+                            </nav>
+                        </aside>
+
+                        <!-- Área Principal de Conteúdo do Formulário -->
+                        <section class="content-area">
+                            <form id="calculator-form" onsubmit="event.preventDefault();">
+                                
+                                <!-- ABA 1: CUSTOS FIXOS (INFORMATIVO READ-ONLY) -->
+                                <div class="tab-content active" id="tab-custos-fixos">
+                                    <div class="section-intro">
+                                        <span class="step-badge">Passo 01</span>
+                                        <h2>Custos Fixos do Escritório</h2>
+                                        <p>As despesas fixas operacionais são gerenciadas na seção central do painel financeiro.</p>
+                                    </div>
+
+                                    <div class="card card-glass placeholder-card" style="padding: 40px; text-align: left; align-items: flex-start;">
+                                        <h3 style="margin-bottom: 8px;">Resumo dos Custos Fixos</h3>
+                                        <p style="margin-bottom: 20px; font-size: 0.95rem;" id="calc-fixed-summary">Seus custos fixos estão calculados em R$ 0,00 por mês.</p>
+                                        
+                                        <div style="display: flex; gap: 12px;">
+                                            <a href="#financeiro" class="btn btn-primary">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                                Ajustar Custos Fixos
+                                            </a>
+                                            <button type="button" class="btn btn-secondary btn-next" data-next="produtividade">Continuar Proposta</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-navigation">
+                                        <span></span>
+                                        <button type="button" class="btn btn-primary btn-next" data-next="produtividade">
+                                            Próximo: Produtividade 
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- ABA 2: PRODUTIVIDADE (INFORMATIVO READ-ONLY) -->
+                                <div class="tab-content" id="tab-produtividade">
+                                    <div class="section-intro">
+                                        <span class="step-badge">Passo 02</span>
+                                        <h2>Produtividade e Horas Disponíveis</h2>
+                                        <p>A capacidade horária e as horas de cliente da equipe são gerenciadas no painel financeiro.</p>
+                                    </div>
+
+                                    <div class="card card-glass placeholder-card" style="padding: 40px; text-align: left; align-items: flex-start;">
+                                        <h3 style="margin-bottom: 8px;">Resumo da Capacidade Mensal</h3>
+                                        <p style="margin-bottom: 20px; font-size: 0.95rem;" id="calc-prod-summary">Sua equipe está configurada com capacidade total de 0h produtivas por mês.</p>
+                                        
+                                        <div style="display: flex; gap: 12px;">
+                                            <a href="#financeiro" class="btn btn-primary">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                                Ajustar Produtividade
+                                            </a>
+                                            <button type="button" class="btn btn-secondary btn-next" data-next="custo-hora">Continuar Proposta</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-navigation">
+                                        <button type="button" class="btn btn-secondary btn-prev" data-prev="custos-fixos">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                            Anterior
+                                        </button>
+                                        <button type="button" class="btn btn-primary btn-next" data-next="custo-hora">
+                                            Próximo: Custo da Hora
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- ABA 3: CUSTO DA HORA (INFORMATIVO READ-ONLY) -->
+                                <div class="tab-content" id="tab-custo-hora">
+                                    <div class="section-intro">
+                                        <span class="step-badge">Passo 03</span>
+                                        <h2>Entenda o Custo da sua Hora de Trabalho</h2>
+                                        <p>Sua hora trabalhada é a relação entre os seus custos fixos e o número total de horas produtivas trabalhadas por toda a sua equipe durante um mês.</p>
+                                    </div>
+
+                                    <div class="card card-glass hourly-rate-math">
+                                        <div class="math-box">
+                                            <div class="math-element">
+                                                <span class="math-title">Custos Fixos</span>
+                                                <span class="math-val" id="math-fixed-cost">R$ 0,00</span>
+                                            </div>
+                                            <div class="math-operator">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><circle cx="12" cy="6" r="1.5"/><circle cx="12" cy="18" r="1.5"/></svg>
+                                            </div>
+                                            <div class="math-element">
+                                                <span class="math-title">Horas Produtivas / Mês</span>
+                                                <span class="math-val" id="math-hours-capacity">0h</span>
+                                            </div>
+                                            <div class="math-operator">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/></svg>
+                                            </div>
+                                            <div class="math-element result-element">
+                                                <span class="math-title">Custo do seu Valor Hora</span>
+                                                <span class="math-val highlight-text" id="math-hourly-rate">R$ 0,00</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card card-glass info-card">
+                                        <div class="info-icon">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                                        </div>
+                                        <div class="info-text">
+                                            <h4>Custo Base de Execução</h4>
+                                            <p>Este valor é calculado dividindo as despesas fixas pelo tempo disponível da equipe. Não é possível alterar esta taxa de hora base diretamente nesta proposta. Para modificá-la, acesse a página de <a href="#financeiro">Financeiro</a> do escritório.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-navigation">
+                                        <button type="button" class="btn btn-secondary btn-prev" data-prev="produtividade">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                            Anterior
+                                        </button>
+                                        <button type="button" class="btn btn-primary btn-next" data-next="horas-projeto">
+                                            Próximo: Horas do Projeto
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- ABA 4: HORAS DO PROJETO -->
+                                <div class="tab-content" id="tab-horas-projeto">
+                                    <div class="section-intro">
+                                        <span class="step-badge">Passo 04</span>
+                                        <h2>Estimativa de Custo de Horas do Projeto</h2>
+                                        <p>Estime o número de horas que você irá gastar para realizar cada etapa de determinado projeto.</p>
+                                    </div>
+
+                                    <div class="card card-glass project-phases-card">
+                                        
+                                        <!-- Importador do catálogo de serviços -->
+                                        <div class="service-importer" style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-glass); display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+                                            <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                                                <label for="calc-select-service" style="font-size: 0.85rem; font-weight: 600;">Importar do Catálogo de Serviços</label>
+                                                <select id="calc-select-service" class="form-input" style="padding: 10px 14px; font-size: 0.9rem;">
+                                                    <option value="">-- Selecione um serviço cadastrado --</option>
+                                                    <!-- Loaded dynamically -->
+                                                </select>
+                                            </div>
+                                            <button type="button" id="btn-import-service" class="btn btn-secondary" style="padding: 10px 18px; font-size: 0.9rem;">Importar Etapa</button>
+                                        </div>
+
+                                        <div class="table-responsive">
+                                            <table class="phases-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Etapa do Projeto</th>
+                                                        <th style="width: 150px;">Horas Estimadas</th>
+                                                        <th style="width: 180px;">Custo da Etapa (R$)</th>
+                                                        <th style="width: 50px;"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="project-phases-list">
+                                                    <!-- Gerado dinamicamente via JS -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="custom-phase-adder">
+                                            <h4>Adicionar Etapa Personalizada</h4>
+                                            <div class="adder-row">
+                                                <input type="text" id="custom-phase-name" placeholder="Nome da etapa (ex: Design de Mobiliário)" class="form-input">
+                                                <input type="number" id="custom-phase-hours" placeholder="Horas" min="0" class="form-input">
+                                                <button type="button" id="btn-add-phase" class="btn btn-secondary">Adicionar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-navigation">
+                                        <button type="button" class="btn btn-secondary btn-prev" data-prev="custo-hora">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                            Anterior
+                                        </button>
+                                        <button type="button" class="btn btn-primary btn-next" data-next="custos-variaveis">
+                                            Próximo: Custos Variáveis
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- ABA 5: CUSTOS VARIÁVEIS -->
+                                <div class="tab-content" id="tab-custos-variaveis">
+                                    <div class="section-intro">
+                                        <span class="step-badge">Passo 05</span>
+                                        <h2>Entenda os Custos Variáveis do Trabalho Entregue</h2>
+                                        <p>Estes custos só existirão se você estiver executando este projeto especificamente para este cliente.</p>
+                                    </div>
+
+                                    <div class="card card-glass variables-card">
+                                        <div class="table-responsive">
+                                            <table class="variables-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Custo Variável / Despesa Extra</th>
+                                                        <th style="width: 200px;">Valor (R$)</th>
+                                                        <th style="width: 50px;"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="variable-costs-list">
+                                                    <!-- Gerado dinamicamente via JS -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="custom-variable-adder">
+                                            <h4>Adicionar Custo Variável Personalizado</h4>
+                                            <div class="adder-row">
+                                                <input type="text" id="custom-var-name" placeholder="Ex: Maquete Eletrônica 3D Terceirizada" class="form-input">
+                                                <div class="input-currency">
+                                                    <span class="currency-symbol">R$</span>
+                                                    <input type="number" id="custom-var-value" placeholder="0,00" step="0.01" min="0" class="form-input">
+                                                </div>
+                                                <button type="button" id="btn-add-variable" class="btn btn-secondary">Adicionar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-navigation">
+                                        <button type="button" class="btn btn-secondary btn-prev" data-prev="horas-projeto">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                            Anterior
+                                        </button>
+                                        <button type="button" class="btn btn-primary btn-next" data-next="lucro-imposto">
+                                            Próximo: Lucro e Imposto
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- ABA 6: LUCRO E IMPOSTO -->
+                                <div class="tab-content" id="tab-lucro-imposto">
+                                    <div class="section-intro">
+                                        <span class="step-badge">Passo 06 & 07</span>
+                                        <h2>Lucro Desejado e Impostos</h2>
+                                        <p>Adicione o percentual de margem de lucro que você deseja obter e a alíquota tributária para emissão da nota fiscal.</p>
+                                    </div>
+
+                                    <div class="pricing-factors-grid">
+                                        <div class="card card-glass slider-card">
+                                            <div class="slider-header">
+                                                <h3>#6 Margem de Lucro Desejada</h3>
+                                                <span class="value-display" id="profit-display">30%</span>
+                                            </div>
+                                            <p class="slider-desc">Recomendado entre 20% e 35% em cima dos custos totais.</p>
+                                            <input type="range" id="input-profit" min="0" max="100" value="30" step="1" class="form-range">
+                                            <div class="slider-ticks">
+                                                <span>0%</span>
+                                                <span>20%</span>
+                                                <span>30%</span>
+                                                <span>35%</span>
+                                                <span>50%</span>
+                                                <span>100%</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="card card-glass tax-card">
+                                            <div class="slider-header">
+                                                <h3>#7 Imposto Recolhido</h3>
+                                                <span class="value-display" id="tax-display">6%</span>
+                                            </div>
+                                            <p class="slider-desc">Varia entre 6% a 15% (Simples Nacional) ou 27.5% (Autônomo/Pessoa Física).</p>
+                                            <input type="range" id="input-tax" min="0" max="40" value="6" step="0.5" class="form-range">
+                                            
+                                            <div class="tax-method-selector">
+                                                <label class="method-label">Método de Cálculo do Imposto:</label>
+                                                <div class="radio-group">
+                                                    <label class="radio-container">
+                                                        <input type="radio" name="tax-method" value="inside" checked>
+                                                        <span class="checkmark"></span>
+                                                        <div>
+                                                            <strong>Por Dentro (Recomendado)</strong>
+                                                            <span class="method-desc">O imposto incide sobre o valor final da nota. O imposto é deduzido do faturamento bruto.</span>
+                                                        </div>
+                                                    </label>
+                                                    <label class="radio-container">
+                                                        <input type="radio" name="tax-method" value="outside">
+                                                        <span class="checkmark"></span>
+                                                        <div>
+                                                            <strong>Markup Simples (Por Fora)</strong>
+                                                            <span class="method-desc">Aplica a porcentagem direto sobre os custos + lucro.</span>
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-navigation">
+                                        <button type="button" class="btn btn-secondary btn-prev" data-prev="custos-variaveis">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                                            Anterior
+                                        </button>
+                                        <button type="button" class="btn btn-primary btn-next" data-next="resultado">
+                                            Ver Proposta Final
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- ABA 7: RESULTADO FINAL -->
+                                <div class="tab-content" id="tab-resultado">
+                                    <div class="section-intro">
+                                        <span class="step-badge">Resumo</span>
+                                        <h2>Relatório de Orçamento do Projeto</h2>
+                                        <p>Associe um cliente e gere a proposta final personalizada com os dados do escritório.</p>
+                                    </div>
+
+                                    <!-- Vínculo com cliente -->
+                                    <div class="card card-glass client-selector-box" style="margin-bottom: 20px; display: flex; gap: 16px; align-items: center; padding: 16px 24px;">
+                                        <label for="calc-select-client" style="font-weight: 600; font-size: 0.9rem; flex-shrink: 0;">Destinatário da Proposta (Cliente):</label>
+                                        <select id="calc-select-client" class="form-input" style="max-width: 320px; padding: 10px 14px; font-size: 0.9rem;">
+                                            <option value="">-- Proposta sem cliente associado --</option>
+                                            <!-- Loaded dynamically -->
+                                        </select>
+                                    </div>
+
+                                    <div class="proposal-container card card-glass" id="proposal-report">
+                                        <div class="proposal-header">
+                                            <div class="proposal-logo">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+                                                    <path d="M2 17L12 22L22 17"/>
+                                                    <path d="M2 12L12 17L22 12"/>
+                                                </svg>
+                                                <span id="rep-office-name">JORNADA DOS ESCRITÓRIOS DE SUCE$$O</span>
+                                            </div>
+                                            <div class="proposal-meta">
+                                                <h3>PROPOSTA DE PRECIFICAÇÃO</h3>
+                                                <p>Data: <span id="report-date">23/07/2026</span></p>
+                                            </div>
+                                        </div>
+
+                                        <div class="proposal-body">
+                                            <!-- Identificação das partes -->
+                                            <div class="report-parties" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-glass);">
+                                                <div class="office-details">
+                                                    <h5 style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Elaborado por:</h5>
+                                                    <p style="font-weight: 700; color: var(--text-contrast);" id="rep-office-owner">-</p>
+                                                    <p style="font-size: 0.85rem; color: var(--text-secondary);" id="rep-office-contact">-</p>
+                                                </div>
+                                                <div class="client-details" id="rep-client-block" style="display: none;">
+                                                    <h5 style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Proposta para:</h5>
+                                                    <p style="font-weight: 700; color: var(--text-contrast);" id="rep-client-name">-</p>
+                                                    <p style="font-size: 0.85rem; color: var(--text-secondary);">
+                                                        <span id="rep-client-email"></span> | <span id="rep-client-phone"></span>
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div class="report-section">
+                                                <h4>1. Estrutura Operacional</h4>
+                                                <div class="report-grid">
+                                                    <div class="report-item">
+                                                        <span class="report-label">Custo Fixo Total do Escritório:</span>
+                                                        <span class="report-val" id="rep-fixed-costs">R$ 0,00</span>
+                                                    </div>
+                                                    <div class="report-item">
+                                                        <span class="report-label">Capacidade Produtiva da Equipe:</span>
+                                                        <span class="report-val" id="rep-monthly-hours">0h / mês</span>
+                                                    </div>
+                                                    <div class="report-item">
+                                                        <span class="report-label">Custo Unitário da Hora:</span>
+                                                        <span class="report-val font-highlight" id="rep-hourly-rate">R$ 0,00 / h</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="report-section">
+                                                <h4>2. Custos Dedicados ao Projeto</h4>
+                                                <div class="report-grid">
+                                                    <div class="report-item">
+                                                        <span class="report-label">Horas Estimadas do Projeto:</span>
+                                                        <span class="report-val" id="rep-project-hours">0h</span>
+                                                    </div>
+                                                    <div class="report-item">
+                                                        <span class="report-label">Custo de Horas de Trabalho:</span>
+                                                        <span class="report-val" id="rep-project-hours-cost">R$ 0,00</span>
+                                                    </div>
+                                                    <div class="report-item">
+                                                        <span class="report-label">Custos Variáveis / Despesas:</span>
+                                                        <span class="report-val" id="rep-project-variables">R$ 0,00</span>
+                                                    </div>
+                                                    <div class="report-item total-cost-item">
+                                                        <span class="report-label">Custo Total de Execução (Hora + Variáveis):</span>
+                                                        <span class="report-val" id="rep-project-total-cost">R$ 0,00</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="report-section">
+                                                <h4>3. Formação do Preço de Venda</h4>
+                                                <div class="report-table-container">
+                                                    <table class="report-table">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>Custo Total do Projeto</td>
+                                                                <td class="text-right" id="row-costs">R$ 0,00</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Lucro Desejado (<span id="rep-profit-pct">0%</span>)</td>
+                                                                <td class="text-right text-success" id="row-profit">R$ 0,00</td>
+                                                            </tr>
+                                                            <tr class="subtotal-row">
+                                                                <td>Subtotal (Custos + Lucro)</td>
+                                                                <td class="text-right" id="row-subtotal">R$ 0,00</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Impostos Recolhidos (<span id="rep-tax-pct">0%</span>)</td>
+                                                                <td class="text-right text-warning" id="row-tax">R$ 0,00</td>
+                                                            </tr>
+                                                            <tr class="final-price-row">
+                                                                <td>Preço Sugerido da Proposta (Final)</td>
+                                                                <td class="text-right text-primary" id="row-final-price">R$ 0,00</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                            <div class="report-section visual-summary">
+                                                <h4>Composição do Preço Final</h4>
+                                                <div class="chart-flex">
+                                                    <div class="chart-container">
+                                                        <!-- Custom Dynamic SVG Donut Chart -->
+                                                        <svg id="svg-donut" width="200" height="200" viewBox="0 0 200 200">
+                                                            <circle cx="100" cy="100" r="70" class="donut-bg" fill="none" stroke-width="20" />
+                                                            <!-- SVG segments will be injected here -->
+                                                            <text x="100" y="95" class="donut-text-price" text-anchor="middle" id="donut-center-price">R$ 0</text>
+                                                            <text x="100" y="120" class="donut-text-label" text-anchor="middle">Valor Total</text>
+                                                        </svg>
+                                                    </div>
+                                                    <div class="chart-legend" id="donut-legend">
+                                                        <!-- Legend generated dynamically -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="proposal-footer">
+                                            <p><strong>Atenção:</strong> O valor calculado é uma estimativa baseada nas premissas de custo fixo, produtividade informada e escopo desenhado. Modificações nas etapas do projeto acarretarão readequações de valores.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="action-buttons-row">
+                                        <button type="button" id="btn-save-project" class="btn btn-success">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                            Salvar Projeto
+                                        </button>
+                                        <button type="button" id="btn-export-pdf" class="btn btn-primary">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                                            Imprimir / Salvar PDF
+                                        </button>
+                                    </div>
+
+                                    <!-- Lista de Projetos Salvos -->
+                                    <div class="saved-projects-section card card-glass">
+                                        <h3>Simulações Salvas</h3>
+                                        <div id="saved-projects-list" class="saved-projects-grid">
+                                            <!-- Injetado dinamicamente -->
+                                            <p class="empty-state">Nenhuma simulação salva ainda. Configure e clique em "Salvar Projeto" acima.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </section>
+
+                        <!-- Sidebar Direita: Painel Resumo Fixo (Sticky) -->
+                        <aside class="sidebar-summary">
+                            <div class="card card-glass summary-sticky-card">
+                                <h3>Resumo Financeiro</h3>
+                                
+                                <div class="summary-stat">
+                                    <span class="stat-label">Custo Fixo Mensal</span>
+                                    <span class="stat-value" id="summary-fixed-costs">R$ 0,00</span>
+                                </div>
+                                
+                                <div class="summary-stat">
+                                    <span class="stat-label">Valor Hora</span>
+                                    <span class="stat-value text-purple" id="summary-hourly-rate">R$ 0,00</span>
+                                    <span class="stat-sub" id="summary-hours-desc">baseado em 0h/mês</span>
+                                </div>
+
+                                <hr class="summary-divider">
+
+                                <div class="summary-stat">
+                                    <span class="stat-label">Custos do Projeto</span>
+                                    <div class="project-mini-breakdown">
+                                        <div>
+                                            <span>Horas (<span id="summary-proj-hours">0h</span>)</span>
+                                            <span id="summary-proj-hours-cost">R$ 0,00</span>
+                                        </div>
+                                        <div>
+                                            <span>Variáveis</span>
+                                            <span id="summary-proj-vars">R$ 0,00</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="summary-stat">
+                                    <span class="stat-label">Lucro do Projeto</span>
+                                    <span class="stat-value text-success" id="summary-profit">R$ 0,00</span>
+                                </div>
+
+                                <div class="summary-stat">
+                                    <span class="stat-label">Imposto Estimado</span>
+                                    <span class="stat-value text-warning" id="summary-tax">R$ 0,00</span>
+                                </div>
+
+                                <div class="summary-stat final-stat">
+                                    <span class="stat-label">Preço Final Sugerido</span>
+                                    <span class="stat-value text-gradient" id="summary-final-price">R$ 0,00</span>
+                                </div>
+
+                                <div class="checklist-tracker">
+                                    <h4>Checklist do Orçamento</h4>
+                                    <ul class="tracker-list">
+                                        <li class="tracker-item" id="chk-fixed">
+                                            <span class="tracker-icon"></span>
+                                            Custos fixos informados
+                                        </li>
+                                        <li class="tracker-item" id="chk-productivity">
+                                            <span class="tracker-icon"></span>
+                                            Produtividade definida
+                                        </li>
+                                        <li class="tracker-item" id="chk-hours">
+                                            <span class="tracker-icon"></span>
+                                            Horas do projeto estimadas
+                                        </li>
+                                        <li class="tracker-item" id="chk-margin">
+                                            <span class="tracker-icon"></span>
+                                            Margem & imposto definidos
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <button type="button" class="btn btn-primary btn-block btn-go-final">
+                                    Ver Relatório Completo
+                                </button>
+                            </div>
+                        </aside>
+                    </div>
+
+                </section>
+
             </div>
-        </aside>
-    </main>
 
-    <footer class="app-footer-bar">
-        <p>Jornada dos Escritórios de Sucesso © 2026 - Desenvolvido para facilitar a precificação e rentabilidade dos seus projetos.</p>
-    </footer>
+            <!-- FOOTER GLOBAL -->
+            <footer class="app-footer-bar">
+                <p>Jornada dos Escritórios de Sucesso © 2026 - Plataforma modular de orçamentos e inteligência financeira.</p>
+            </footer>
+
+        </main>
+    </div>
 
     <!-- Scripts da Aplicação -->
     <script src="app.js"></script>
