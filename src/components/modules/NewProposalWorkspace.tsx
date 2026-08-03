@@ -29,10 +29,10 @@ export function NewProposalWorkspace() {
   )
 
   const updateClientInfo = usePricingStore((s) => s.updateClientInfo)
-  const togglePhaseSelection = usePricingStore((s) => s.togglePhaseSelection)
-  const updateSelectedPhaseHours = usePricingStore((s) => s.updateSelectedPhaseHours)
-  const addCustomPhaseToProposal = usePricingStore((s) => s.addCustomPhaseToProposal)
-  const removePhaseFromProposal = usePricingStore((s) => s.removePhaseFromProposal)
+  const toggleProposalPhase = usePricingStore((s) => s.toggleProposalPhase)
+  const updatePhaseHours = usePricingStore((s) => s.updatePhaseHours)
+  const addGlobalPhase = usePricingStore((s) => s.addGlobalPhase)
+  const removeGlobalPhase = usePricingStore((s) => s.removeGlobalPhase)
   const syncPhasesFromCatalog = usePricingStore((s) => s.syncPhasesFromCatalog)
   const updateVariableCost = usePricingStore((s) => s.updateVariableCost)
   const addVariableCost = usePricingStore((s) => s.addVariableCost)
@@ -46,8 +46,8 @@ export function NewProposalWorkspace() {
   const deleteSavedProposal = usePricingStore((s) => s.deleteSavedProposal)
   const saveCurrentProposal = usePricingStore((s) => s.saveCurrentProposal)
 
-  const [customPhaseName, setCustomPhaseName] = useState('')
-  const [customPhaseHours, setCustomPhaseHours] = useState(8)
+  const [newPhaseName, setNewPhaseName] = useState('')
+  const [newPhaseHours, setNewPhaseHours] = useState(8)
   const [variableName, setVariableName] = useState('')
   const [variableValue, setVariableValue] = useState(0)
 
@@ -146,118 +146,113 @@ export function NewProposalWorkspace() {
 
             <GlassCard
               title="Atividades do projeto"
-              description="Selecione etapas do catálogo do escritório e ajuste as horas deste orçamento."
+              description="Catálogo do escritório: marque as etapas deste orçamento, ajuste horas ou exclua definitivamente do catálogo."
             >
               <div className="mb-3 flex justify-end">
                 <button
                   type="button"
-                  onClick={syncPhasesFromCatalog}
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        'Restaurar a seleção deste orçamento com todas as etapas do catálogo atual? Horas personalizadas serão sobrescritas.',
+                      )
+                    ) {
+                      syncPhasesFromCatalog()
+                    }
+                  }}
                   className="text-xs font-medium text-[var(--color-primary)] hover:underline"
                 >
-                  Restaurar catálogo padrão
+                  Selecionar todas do catálogo
                 </button>
               </div>
 
               <div className="space-y-2">
-                {catalogPhases.map((phase) => {
-                  const selected = selectedIds.has(phase.id)
-                  const selectedPhase = selectedPhases.find(
-                    (item) => item.id === phase.id,
-                  )
-                  return (
-                    <div
-                      key={phase.id}
-                      className={[
-                        'grid grid-cols-[auto_1fr_110px] items-center gap-3 rounded-xl border px-3 py-2.5',
-                        selected
-                          ? 'border-[var(--color-primary)]/40 bg-[var(--color-primary-glow)]'
-                          : 'border-[var(--border-glass)] opacity-70',
-                      ].join(' ')}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selected}
-                        onChange={() => togglePhaseSelection(phase.id)}
-                        className="h-4 w-4 accent-[var(--color-primary)]"
-                      />
-                      <span className="truncate text-sm">{phase.name}</span>
-                      <input
-                        type="number"
-                        min={0}
-                        disabled={!selected}
-                        value={selectedPhase?.hours ?? phase.hours}
-                        onChange={(e) =>
-                          updateSelectedPhaseHours(
-                            phase.id,
-                            Number(e.target.value) || 0,
-                          )
-                        }
-                        className="rounded-lg border border-[var(--border-glass)] bg-[var(--input-bg)] px-2 py-1.5 text-sm outline-none disabled:opacity-40 focus:border-[var(--color-primary)]"
-                      />
-                    </div>
-                  )
-                })}
-
-                {selectedPhases
-                  .filter(
-                    (phase) =>
-                      !catalogPhases.some((item) => item.id === phase.id),
-                  )
-                  .map((phase) => (
-                    <div
-                      key={phase.id}
-                      className="grid grid-cols-[1fr_110px_auto] items-center gap-3 rounded-xl border border-[var(--border-glass)] px-3 py-2.5"
-                    >
-                      <span className="truncate text-sm">{phase.name}</span>
-                      <input
-                        type="number"
-                        min={0}
-                        value={phase.hours}
-                        onChange={(e) =>
-                          updateSelectedPhaseHours(
-                            phase.id,
-                            Number(e.target.value) || 0,
-                          )
-                        }
-                        className="rounded-lg border border-[var(--border-glass)] bg-[var(--input-bg)] px-2 py-1.5 text-sm outline-none focus:border-[var(--color-primary)]"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removePhaseFromProposal(phase.id)}
-                        className="text-[var(--color-danger)]"
-                        aria-label="Remover etapa"
+                {catalogPhases.length === 0 ? (
+                  <p className="rounded-xl border border-dashed border-[var(--border-glass)] px-3 py-4 text-center text-sm text-[var(--text-muted)]">
+                    Nenhuma etapa no catálogo. Inclua a primeira abaixo.
+                  </p>
+                ) : (
+                  catalogPhases.map((phase) => {
+                    const selected = selectedIds.has(phase.id)
+                    const selectedPhase = selectedPhases.find(
+                      (item) => item.id === phase.id,
+                    )
+                    return (
+                      <div
+                        key={phase.id}
+                        className={[
+                          'grid grid-cols-[auto_1fr_110px_auto] items-center gap-3 rounded-xl border px-3 py-2.5',
+                          selected
+                            ? 'border-[var(--color-primary)]/40 bg-[var(--color-primary-glow)]'
+                            : 'border-[var(--border-glass)] opacity-70',
+                        ].join(' ')}
                       >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={() => toggleProposalPhase(phase.id)}
+                          className="h-4 w-4 accent-[var(--color-primary)]"
+                          aria-label={`Selecionar ${phase.name}`}
+                        />
+                        <span className="truncate text-sm">{phase.name}</span>
+                        <input
+                          type="number"
+                          min={0}
+                          disabled={!selected}
+                          value={selectedPhase?.hours ?? phase.hours}
+                          onChange={(e) =>
+                            updatePhaseHours(phase.id, Number(e.target.value) || 0)
+                          }
+                          className="rounded-lg border border-[var(--border-glass)] bg-[var(--input-bg)] px-2 py-1.5 text-sm outline-none disabled:opacity-40 focus:border-[var(--color-primary)]"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (
+                              window.confirm(
+                                `Excluir "${phase.name}" do catálogo do escritório? Ela também será removida deste orçamento e não aparecerá em novos orçamentos.`,
+                              )
+                            ) {
+                              removeGlobalPhase(phase.id)
+                            }
+                          }}
+                          className="rounded-lg p-1.5 text-[var(--color-danger)] transition hover:bg-[var(--bg-glass-hover)]"
+                          aria-label={`Excluir ${phase.name} do catálogo`}
+                          title="Excluir do catálogo do escritório"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    )
+                  })
+                )}
               </div>
 
               <div className="mt-4 grid gap-2 md:grid-cols-[1.4fr_110px_auto]">
                 <input
-                  value={customPhaseName}
-                  onChange={(e) => setCustomPhaseName(e.target.value)}
-                  placeholder="Etapa personalizada neste orçamento"
+                  value={newPhaseName}
+                  onChange={(e) => setNewPhaseName(e.target.value)}
+                  placeholder="Nova etapa no catálogo do escritório"
                   className="rounded-xl border border-[var(--border-glass)] bg-[var(--input-bg)] px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
                 />
                 <input
                   type="number"
                   min={0}
-                  value={customPhaseHours}
-                  onChange={(e) => setCustomPhaseHours(Number(e.target.value) || 0)}
+                  value={newPhaseHours}
+                  onChange={(e) => setNewPhaseHours(Number(e.target.value) || 0)}
                   className="rounded-xl border border-[var(--border-glass)] bg-[var(--input-bg)] px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
                 />
                 <button
                   type="button"
                   onClick={() => {
-                    addCustomPhaseToProposal({
-                      name: customPhaseName,
-                      hours: customPhaseHours,
+                    addGlobalPhase({
+                      name: newPhaseName,
+                      hours: newPhaseHours,
                     })
-                    setCustomPhaseName('')
-                    setCustomPhaseHours(8)
+                    setNewPhaseName('')
+                    setNewPhaseHours(8)
                   }}
-                  className="inline-flex items-center justify-center gap-1 rounded-xl border border-[var(--border-glass)] px-3 py-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                  className="inline-flex items-center justify-center gap-1 rounded-xl bg-gradient-to-r from-[#9d4edd] to-[#e050a2] px-3 py-2 text-sm font-semibold text-white"
                 >
                   <Plus className="h-4 w-4" />
                   Incluir

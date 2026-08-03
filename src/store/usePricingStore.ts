@@ -44,8 +44,12 @@ export interface PricingStoreActions {
   setWorkdays: (workdays: number) => void
   updateTeamRole: (role: TeamRoleKey, patch: Partial<TeamRole>) => void
   updateDefaultPhase: (id: string, patch: Partial<Pick<ProjectPhase, 'name' | 'hours'>>) => void
+  /** @deprecated Prefer addGlobalPhase */
   addDefaultPhase: (input: { name: string; hours: number }) => void
+  /** @deprecated Prefer removeGlobalPhase */
   deleteDefaultPhase: (id: string) => void
+  addGlobalPhase: (input: { name: string; hours: number }) => void
+  removeGlobalPhase: (id: string) => void
   setDefaultTaxRate: (rate: number) => void
   setDefaultTaxMethod: (method: TaxMethod) => void
   resetOfficeConfig: () => void
@@ -53,8 +57,13 @@ export interface PricingStoreActions {
   // Active proposal
   updateClientInfo: (patch: Partial<ClientInfo>) => void
   setProposalStatus: (status: ProposalStatus) => void
+  toggleProposalPhase: (id: string) => void
+  updatePhaseHours: (id: string, hours: number) => void
+  /** @deprecated Prefer toggleProposalPhase */
   togglePhaseSelection: (phaseId: string) => void
+  /** @deprecated Prefer updatePhaseHours */
   updateSelectedPhaseHours: (id: string, hours: number) => void
+  /** @deprecated Prefer addGlobalPhase for catalog-backed phases */
   addCustomPhaseToProposal: (input: { name: string; hours: number }) => void
   removePhaseFromProposal: (id: string) => void
   syncPhasesFromCatalog: () => void
@@ -191,7 +200,7 @@ export const usePricingStore = create<PricingStore>()(
           },
         })),
 
-      addDefaultPhase: ({ name, hours }) => {
+      addGlobalPhase: ({ name, hours }) => {
         const trimmed = name.trim()
         if (!trimmed) return
 
@@ -206,10 +215,17 @@ export const usePricingStore = create<PricingStore>()(
             ...state.officeConfig,
             defaultPhases: [...state.officeConfig.defaultPhases, item],
           },
+          activeProposal: {
+            ...state.activeProposal,
+            selectedPhases: [
+              ...state.activeProposal.selectedPhases,
+              structuredClone(item),
+            ],
+          },
         }))
       },
 
-      deleteDefaultPhase: (id) =>
+      removeGlobalPhase: (id) =>
         set((state) => ({
           officeConfig: {
             ...state.officeConfig,
@@ -217,7 +233,16 @@ export const usePricingStore = create<PricingStore>()(
               (phase) => phase.id !== id,
             ),
           },
+          activeProposal: {
+            ...state.activeProposal,
+            selectedPhases: state.activeProposal.selectedPhases.filter(
+              (phase) => phase.id !== id,
+            ),
+          },
         })),
+
+      addDefaultPhase: (input) => get().addGlobalPhase(input),
+      deleteDefaultPhase: (id) => get().removeGlobalPhase(id),
 
       setDefaultTaxRate: (rate) =>
         set((state) => ({
@@ -262,10 +287,10 @@ export const usePricingStore = create<PricingStore>()(
           },
         })),
 
-      togglePhaseSelection: (phaseId) =>
+      toggleProposalPhase: (id) =>
         set((state) => {
           const exists = state.activeProposal.selectedPhases.some(
-            (phase) => phase.id === phaseId,
+            (phase) => phase.id === id,
           )
 
           if (exists) {
@@ -273,14 +298,14 @@ export const usePricingStore = create<PricingStore>()(
               activeProposal: {
                 ...state.activeProposal,
                 selectedPhases: state.activeProposal.selectedPhases.filter(
-                  (phase) => phase.id !== phaseId,
+                  (phase) => phase.id !== id,
                 ),
               },
             }
           }
 
           const catalogPhase = state.officeConfig.defaultPhases.find(
-            (phase) => phase.id === phaseId,
+            (phase) => phase.id === id,
           )
           if (!catalogPhase) return state
 
@@ -295,7 +320,7 @@ export const usePricingStore = create<PricingStore>()(
           }
         }),
 
-      updateSelectedPhaseHours: (id, hours) =>
+      updatePhaseHours: (id, hours) =>
         set((state) => ({
           activeProposal: {
             ...state.activeProposal,
@@ -305,23 +330,10 @@ export const usePricingStore = create<PricingStore>()(
           },
         })),
 
-      addCustomPhaseToProposal: ({ name, hours }) => {
-        const trimmed = name.trim()
-        if (!trimmed) return
+      togglePhaseSelection: (phaseId) => get().toggleProposalPhase(phaseId),
+      updateSelectedPhaseHours: (id, hours) => get().updatePhaseHours(id, hours),
 
-        const item: ProjectPhase = {
-          id: `ph-proposal-${Date.now()}`,
-          name: trimmed,
-          hours: Math.max(0, hours),
-        }
-
-        set((state) => ({
-          activeProposal: {
-            ...state.activeProposal,
-            selectedPhases: [...state.activeProposal.selectedPhases, item],
-          },
-        }))
-      },
+      addCustomPhaseToProposal: (input) => get().addGlobalPhase(input),
 
       removePhaseFromProposal: (id) =>
         set((state) => ({
